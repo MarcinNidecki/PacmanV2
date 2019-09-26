@@ -20,7 +20,6 @@ public class GameMenu extends JComponent {
         panel = new ImagePanel(image);
         panel.setPreferredSize(new Dimension(261, 226));
 
-
         java.net.URL imgURL = GameInit.class.getResource("/assets/textures/exit.png");
         ImageIcon exitIcon = new ImageIcon(imgURL);
         JButton exit = new JButton("", exitIcon);
@@ -33,22 +32,19 @@ public class GameMenu extends JComponent {
         java.net.URL imgURL4 = GameInit.class.getResource("/assets/textures/ranking.png");
         ImageIcon rankingIcon = new ImageIcon(imgURL4);
         JButton ranking = new JButton("", rankingIcon);
-        ranking.addActionListener(e ->  showRanking());
+        ranking.addActionListener(e -> showRanking());
         ranking.setOpaque(false);
         ranking.setBorderPainted(false);
         ranking.setContentAreaFilled(false);
         ranking.setVisible(true);
-
 
         java.net.URL imgURL2 = GameInit.class.getResource("/assets/textures/newGame.png");
         ImageIcon startGameIcon = new ImageIcon(imgURL2);
         JButton newGame = new JButton("", startGameIcon);
         newGame.addActionListener(e -> game.resetGame());
         newGame.setOpaque(false);
-
         newGame.setBorderPainted(false);
         newGame.setContentAreaFilled(false);
-
         newGame.setVisible(true);
         panel.setLayout(new GridLayout(4, 1));
 
@@ -63,7 +59,6 @@ public class GameMenu extends JComponent {
         return panel;
     }
 
-
     public void showMenu() {
         panel.setVisible(true);
     }
@@ -73,6 +68,7 @@ public class GameMenu extends JComponent {
         g.setColor(Color.YELLOW);
 
     }
+
     void showRanking() {
         rankingMenu.getPanel().setVisible(true);
         panel.setVisible(false);

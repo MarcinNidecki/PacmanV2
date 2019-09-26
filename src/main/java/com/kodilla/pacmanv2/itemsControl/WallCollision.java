@@ -1,6 +1,5 @@
 package com.kodilla.pacmanv2.itemsControl;
 
-import com.kodilla.pacmanv2.Constant;
 import com.kodilla.pacmanv2.items.Wall;
 import com.kodilla.pacmanv2.pacmanBoard.levelFactory.LevelFactory;
 
@@ -9,19 +8,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static com.kodilla.pacmanv2.Constant.SPEED;
+import static com.kodilla.pacmanv2.Constant.TILE_SIZE;
+
 public class WallCollision {
 
-    private Constant constant;
 
-    public  WallCollision (Constant constant) {
-        this.constant = constant;
-    }
-    
     public boolean isNoCollision(int x, int y) {
-        Rectangle rectangle = new Rectangle(x, y, constant.getTILE_SIZE(), constant.getTILE_SIZE());
+        Rectangle rectangle = new Rectangle(x, y, TILE_SIZE, TILE_SIZE);
 
-        int yLine = y / constant.getTILE_SIZE();
-        int xLine = x / constant.getTILE_SIZE();
+        int yLine = y / TILE_SIZE;
+        int xLine = x / TILE_SIZE;
 
         List<Map.Entry> listOfCollidingTile = LevelFactory.maze.getMaze().entrySet().parallelStream()
                 .filter(lineOfMaze -> lineOfMaze.getKey() <= yLine + 1 && lineOfMaze.getKey() >= yLine - 1)
@@ -35,19 +32,19 @@ public class WallCollision {
     }
 
     public boolean thereIsNoCollisionOnLeft(int x, int y) {
-        return isNoCollision(x - constant.getSPEED(), y);
+        return isNoCollision(x - SPEED, y);
     }
 
     public boolean thereIsNoCollisionOnRight(int x, int y) {
-        return isNoCollision(x + constant.getSPEED(), y);
+        return isNoCollision(x + SPEED, y);
     }
 
     public boolean thereIsNoCollisionOnDown(int x, int y) {
-        return isNoCollision(x, y + constant.getSPEED());
+        return isNoCollision(x, y + SPEED);
     }
 
     public boolean thereIsNoCollisionOnUp(int x, int y) {
-        return isNoCollision(x, y - constant.getSPEED());
+        return isNoCollision(x, y - SPEED);
     }
 
 }

@@ -9,36 +9,46 @@ import com.kodilla.pacmanv2.pacmanBoard.statistic.PlayerLives;
 
 import java.awt.*;
 
+import static com.kodilla.pacmanv2.Constant.TILE_SIZE;
 import static com.kodilla.pacmanv2.pacmanBoard.levelFactory.LevelFactory.maze;
 
 public class Player extends Rectangle {
 
 
-    private static boolean isAlive= true;
-    private GameInit gameInit;
-    private static boolean addedToRanking=false;
+    private static boolean isAlive = true;
+    private static int timeAnimation = 0;
     private final WallCollision wallCollision;
+    private GameInit gameInit;
     private int animationPicture;
     private Music music = new Music();
     private int playerImagePossition;
-    private static int timeAnimation = 0;
     private int startingLocationX, startingLocationY;
     private BonusMode bonusMode;
     private int speed = 4;
     private String mainDirection = "STOP", nextDirection = "STOP";
     private boolean HitByEnemy = false;
-    private Constant constant;
 
-    public Player(int x, int y, GameInit gameInit, Constant constant, WallCollision wallCollision, BonusMode bonusMode) {
+
+    public Player(int x, int y, GameInit gameInit, WallCollision wallCollision, BonusMode bonusMode) {
         this.gameInit = gameInit;
-        this.constant = constant;
         this.bonusMode = bonusMode;
         this.wallCollision = wallCollision;
         startingLocationY = y;
         startingLocationX = x;
-        setBounds(x, y, constant.getTILE_SIZE(), constant.getTILE_SIZE());
+        setBounds(x, y, Constant.TILE_SIZE, Constant.TILE_SIZE);
     }
 
+    public static boolean isAlive() {
+        return isAlive;
+    }
+
+    public static void setIsAlive(boolean isAlive) {
+        Player.isAlive = isAlive;
+    }
+
+    public static void setTimeAnimation(int timeAnimation) {
+        Player.timeAnimation = timeAnimation;
+    }
 
     public void tick() {
 
@@ -136,12 +146,12 @@ public class Player extends Rectangle {
     }
 
     private boolean isInTheMiddleOfTile(int y) {
-        return y % constant.getTILE_SIZE() == 0;
+        return y % TILE_SIZE == 0;
     }
 
     private void playerAnimation() {
 
-        if(isAlive) {
+        if (isAlive) {
 
             if (timeAnimation == 0) {
                 animationPicture = 0;
@@ -158,34 +168,34 @@ public class Player extends Rectangle {
             timeAnimation++;
 
             //
-        } else  {
+        } else {
 
             if (timeAnimation == 0) {
-                playerImagePossition=4;
+                playerImagePossition = 4;
                 animationPicture = 0;
             } else if (timeAnimation == 20) {
-                playerImagePossition=4;
+                playerImagePossition = 4;
                 animationPicture = 1;
             } else if (timeAnimation == 40) {
-                playerImagePossition=4;
+                playerImagePossition = 4;
                 animationPicture = 2;
             } else if (timeAnimation == 60) {
-                playerImagePossition=4;
+                playerImagePossition = 4;
                 animationPicture = 3;
-            } else if (timeAnimation ==80) {
-                playerImagePossition =5;
-                animationPicture=0;
-            } else if (timeAnimation ==100) {
-                playerImagePossition =5;
-                animationPicture=1;
-            } else if (timeAnimation==120) {
-                playerImagePossition =5;
-                animationPicture=2;
+            } else if (timeAnimation == 80) {
+                playerImagePossition = 5;
+                animationPicture = 0;
+            } else if (timeAnimation == 100) {
+                playerImagePossition = 5;
+                animationPicture = 1;
+            } else if (timeAnimation == 120) {
+                playerImagePossition = 5;
+                animationPicture = 2;
 
-            } else if (timeAnimation== 230) {
+            } else if (timeAnimation == 230) {
 
                 animationPicture = 0;
-                playerImagePossition =0;
+                playerImagePossition = 0;
                 sendPlayerToStart();
 
             }
@@ -254,12 +264,11 @@ public class Player extends Rectangle {
 
     }
 
-
     private void ifIntersectWithDotThenRemoveDotAndAddPoints(int x, int y) {
 
 
-        Rectangle rectangle = new Rectangle(x, y, constant.getTILE_SIZE(), constant.getTILE_SIZE());
-        int lineNumber = y / constant.getTILE_SIZE();
+        Rectangle rectangle = new Rectangle(x, y, TILE_SIZE, TILE_SIZE);
+        int lineNumber = y / TILE_SIZE;
 
         int minLineNumber, maxLinenumber;
         maxLinenumber = lineNumber + 1;
@@ -274,7 +283,7 @@ public class Player extends Rectangle {
                 if (item instanceof Dot) {
                     if (rectangle.intersects((Dot) item)) {
 
-                        maze.getMaze().get(lineNumber).getLineOfItems().replace(itemNumber, new Empty(x, y,constant));
+                        maze.getMaze().get(lineNumber).getLineOfItems().replace(itemNumber, new Empty(x, y));
                         music.playEatBallMusic();
                         if (((Dot) item).isBigDot()) {
                             gameInit.getScore().addPointForBigDot();
@@ -317,48 +326,21 @@ public class Player extends Rectangle {
     }
 
     public boolean isHitByEnemy() {
-         return HitByEnemy;
+        return HitByEnemy;
     }
 
     public void setHitByEnemy(boolean hitByEnemy) {
         HitByEnemy = hitByEnemy;
     }
+
     public void stop() {
         mainDirection = "STOP";
         nextDirection = "STOP";
     }
-    public static String getUserName() {
-        return userName;
-    }
 
-    public void setUserName(String userName) {
-        Player.userName = userName;
-    }
-
-    private static String userName = "Ad";
-
-    public static boolean isAlive() {
-        return isAlive;
-    }
-
-    public static void setIsAlive(boolean isAlive) {
-        Player.isAlive = isAlive;
-    }
-
-    public static boolean isAddedToRanking() {
-        return addedToRanking;
-    }
-
-    public static void setAddedToRanking(boolean addedToRanking) {
-        Player.addedToRanking = addedToRanking;
-    }
-
-    public static void setTimeAnimation(int timeAnimation) {
-        Player.timeAnimation = timeAnimation;
-    }
     public void repaint(Graphics g) {
 
-            g.drawImage(ItemPictures.player[playerImagePossition][animationPicture], x, y, 32, 32, null);
+        g.drawImage(ItemPictures.player[playerImagePossition][animationPicture], x, y, 32, 32, null);
     }
 
     public void sendPlayerToStart() {
@@ -367,7 +349,7 @@ public class Player extends Rectangle {
     }
 
     public void checkIfPlayerisAlive() {
-        if (PlayerLives.getLives()<0) {
+        if (PlayerLives.getLives() < 0) {
             isAlive = false;
             mainDirection = "STOP";
             nextDirection = "STOP";

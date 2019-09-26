@@ -4,7 +4,6 @@ import java.util.HashMap;
 
 public class Maze {
 
-
     private HashMap<Integer, LineOfMaze> maze = new HashMap<>();
 
     void addLine(Integer lineNr, LineOfMaze line) {

@@ -1,7 +1,7 @@
 package com.kodilla.pacmanv2;
 
-        import javax.swing.*;
-        import java.awt.*;
+import javax.swing.*;
+import java.awt.*;
 
 public class ImagePanel extends JPanel {
 

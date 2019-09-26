@@ -1,7 +1,10 @@
 package com.kodilla.pacmanv2.pacmanBoard.statistic;
 
 import java.io.*;
-import java.util.*;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeMap;
 
 
 public class Ranking implements Serializable {
@@ -9,6 +12,14 @@ public class Ranking implements Serializable {
 
     private static HashMap<String, Integer> ranking = new HashMap<>();
 
+    private static TreeMap<String, Integer> sortMapByValue(HashMap<String, Integer> map) {
+        Comparator<String> comparator = new RankingValueComparator(map);
+        //TreeMap is a map sorted by its key.
+        //The comparator is used to sort the TreeMap by key.
+        TreeMap<String, Integer> result = new TreeMap<>(comparator);
+        result.putAll(map);
+        return result;
+    }
 
     public String RankingTop10ToString() {
 
@@ -22,19 +33,10 @@ public class Ranking implements Serializable {
             count++;
 
             if (count <= 10) {
-                   rankingBuilder.append("" + count + "    " + e.getKey() + " points:  " + e.getValue() + "\n");
+                rankingBuilder.append("" + count + "    " + e.getKey() + " points:  " + e.getValue() + "\n");
             }
         }
         return rankingBuilder.toString();
-    }
-
-    private static TreeMap<String, Integer> sortMapByValue(HashMap<String, Integer> map) {
-        Comparator<String> comparator = new RankingValueComparator(map);
-        //TreeMap is a map sorted by its key.
-        //The comparator is used to sort the TreeMap by key.
-        TreeMap<String, Integer> result = new TreeMap<>(comparator);
-        result.putAll(map);
-        return result;
     }
 
     public HashMap<String, Integer> getRanking() {
@@ -65,8 +67,6 @@ public class Ranking implements Serializable {
         } catch (IOException e) {
             System.out.println("Error initializing stream");
         }
-
-
     }
     */
 

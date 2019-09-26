@@ -21,7 +21,6 @@ public class ScoreCounter {
         this.score = this.score + pointForBigDot;
     }
 
-
     public void paint(Graphics g) {
 
         Font stringFont = new Font("Courier", Font.BOLD, 18);

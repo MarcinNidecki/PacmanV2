@@ -1,20 +1,12 @@
 package com.kodilla.pacmanv2.items;
 
-import com.kodilla.pacmanv2.Constant;
-
 import java.awt.*;
 
+import static com.kodilla.pacmanv2.Constant.TILE_SIZE;
+
 public class Empty extends Rectangle implements Items {
-    Constant constant;
 
-    public Empty(int x, int y, Constant constant) {
-        this.constant = constant;
-        setBounds(x, y, constant.getTILE_SIZE(), constant.getTILE_SIZE());
-    }
-
-
-    @Override
-    public String toString() {
-        return "" + x + y;
+    public Empty(int x, int y) {
+        setBounds(x, y, TILE_SIZE, TILE_SIZE);
     }
 }

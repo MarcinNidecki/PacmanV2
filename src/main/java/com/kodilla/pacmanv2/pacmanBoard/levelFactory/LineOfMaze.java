@@ -8,7 +8,6 @@ public class LineOfMaze {
 
     private HashMap<Integer, Items> lineOfItems = new HashMap<>();
 
-
     void addElement(Integer lineNr, Items items) {
 
         lineOfItems.put(lineNr, items);

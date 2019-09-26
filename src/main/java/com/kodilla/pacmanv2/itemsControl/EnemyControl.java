@@ -12,65 +12,38 @@ import java.awt.*;
 public class EnemyControl {
     private final Enemy enemy;
     private final Player player;
-    private Constant constant;
-    private GameInit gameInit;
     private final WallCollision wallCollision;
+    private GameInit gameInit;
     private Music music = new Music();
 
-    public EnemyControl(Enemy enemy, Player player, Constant constant, WallCollision wallCollision, GameInit gameInit) {
+    public EnemyControl(Enemy enemy, Player player, WallCollision wallCollision, GameInit gameInit) {
         this.enemy = enemy;
-        this.constant = constant;
         this.player = player;
         this.gameInit = gameInit;
         this.wallCollision = wallCollision;
-    }
-
-
-    public void goDown() {
-        enemy.y += constant.getSPEED();
-    }
-
-    public void goUp() {
-        enemy.y -= constant.getSPEED();
-    }
-
-    public void goRight() {
-        enemy.x += constant.getSPEED();
-    }
-
-    public void goLeft() {
-        enemy.x -= constant.getSPEED();
-    }
-
-
-    public boolean checkIfIsInHome() {
-        return enemy.y <= constant.getTILE_SIZE() * 11 && enemy.y > constant.getTILE_SIZE() * 8 && enemy.x > constant.getTILE_SIZE() * 17 && enemy.x < constant.getTILE_SIZE() * 21;
     }
 
     public void checkIfNeedToUseATeleport() {
         if (enemy.x == 1480 && enemy.y == 400) {
             enemy.x = 0;
             goRight();
-
         }
-
         if (enemy.x == 0 && enemy.y == 400) {
             enemy.x = 1480;
             goLeft();
-
         }
     }
 
     public void checkIfIntersectWithPlayer(int xx, int yy) {
-        Rectangle rectangle = new Rectangle(xx, yy, constant.getTILE_SIZE(), constant.getTILE_SIZE());
+        Rectangle rectangle = new Rectangle(xx, yy, Constant.TILE_SIZE, Constant.TILE_SIZE);
         if (rectangle.intersects(player.getX(), player.getY(), 40, 40)) {
 
             // if is bonus send enemy to home
-            if (constant.isBONUS()) {
+            if (Constant.BONUS) {
                 enemy.setItsEye(true);
                 music.playEatGhostMusic();
             } else {
-                if (PlayerLives.getLives()>=1) {
+                if (PlayerLives.getLives() >= 1) {
                     Player.setIsAlive(false);
                     player.stop();
                     music.playDeathMusic();
@@ -83,204 +56,235 @@ public class EnemyControl {
 
     public void changeDirection() {
 
-
-        //  when enemy have more then 2 way to choose,  check where is player then go closer
-        //  when enemy have only one possibilities then just change direction.
         switch (enemy.getDirection()) {
             case UP:
             case DOWN:
-                if (wallCollision.thereIsNoCollisionOnLeft(enemy.x, enemy.y) && wallCollision.thereIsNoCollisionOnRight(enemy.x, enemy.y)) {
-
-                    // if you have 2 open direction  check player position then change direction
-                    if (enemy.x > player.getX()) {
-                        enemy.setDirections(Enemy.Directions.LEFT);
-                        goLeft();
-                        break;
+                if (checkIfLeftAndRightAreClean()) {
+                    chooseLeftOrRight();
+                } else {
+                    if (wallCollision.thereIsNoCollisionOnRight(enemy.x, enemy.y)) {
+                        checkAndMOveRight();
                     } else {
-                        enemy.setDirections(Enemy.Directions.RIGHT);
-                        goRight();
-                        break;
+                        checkAndMoveLeft();
                     }
                 }
-
-                if (wallCollision.thereIsNoCollisionOnRight(enemy.x, enemy.y)) {
-                    enemy.setDirections(Enemy.Directions.RIGHT);
-                    goRight();
-                    break;
-                }
-                if (wallCollision.thereIsNoCollisionOnLeft(enemy.x, enemy.y)) {
-                    enemy.setDirections(Enemy.Directions.LEFT);
-                    goLeft();
-                    break;
-                }
+                break;
 
             case RIGHT:
             case LEFT:
-                if (wallCollision.thereIsNoCollisionOnDown(enemy.x, enemy.y) && wallCollision.thereIsNoCollisionOnUp(enemy.x, enemy.y)) {
-                    if (enemy.y < player.getY()) {
-                        enemy.setDirections(Enemy.Directions.DOWN);
-                        goDown();
-                        break;
+                if (checkIfUpAndDownAreClean()) {
+                    CheckAndMoveDownOrUp();
+                } else {
+                    if (wallCollision.thereIsNoCollisionOnDown(enemy.x, enemy.y)) {
+                        checkAndMoveDown();
                     } else {
-                        enemy.setDirections(Enemy.Directions.UP);
-                        goUp();
-                        break;
+                        checkAndMoveUp();
                     }
-
                 }
-                if (wallCollision.thereIsNoCollisionOnDown(enemy.x, enemy.y)) {
-                    enemy.setDirections(Enemy.Directions.DOWN);
-                    goDown();
-                    break;
-
-                }
-                if (wallCollision.thereIsNoCollisionOnUp(enemy.x, enemy.y)) {
-                    enemy.setDirections(Enemy.Directions.UP);
-                    goUp();
-                    break;
-                }
+                break;
         }
     }
 
-    private void EscapeOnDistanceWhenLeftOrRight(int safeDistance) {
+    private Enemy.Directions escapeOnDistanceWhenLeftOrRight(int safeDistance) {
 
         // if enemy is in a center of tile  and can go up and  player is above enemy
-        if (enemy.x % constant.getTILE_SIZE() == 0 && wallCollision.thereIsNoCollisionOnUp(enemy.x, enemy.y) && enemy.y <= player.getY()) {
+        if (isInMiddleOfTileX() && wallCollision.thereIsNoCollisionOnUp(enemy.x, enemy.y) && isEnemyAbovePlayer()) {
             if ((player.getY() - enemy.y) < safeDistance) {
-                enemy.setDirections(Enemy.Directions.UP);
-                goUp();
-                enemy.setChangeOfDirection(true);
-                return;
+                return Enemy.Directions.UP;
             } else {
                 if (wallCollision.thereIsNoCollisionOnDown(enemy.x, enemy.y)) {
-                    enemy.setDirections(Enemy.Directions.DOWN);
-                    goDown();
-                    enemy.setChangeOfDirection(true);
-                    return;
+                    return Enemy.Directions.DOWN;
                 }
-
             }
-            if (enemy.x % constant.getTILE_SIZE() == 0 && wallCollision.thereIsNoCollisionOnDown(enemy.x, enemy.y) && enemy.y >= player.getY()) {
+            if (isInMiddleOfTileX() && wallCollision.thereIsNoCollisionOnDown(enemy.x, enemy.y) && isEnemyUnderPlayer()) {
                 if ((enemy.y - player.getY()) < safeDistance) {
-                    enemy.setDirections(Enemy.Directions.DOWN);
-                    goDown();
-                    enemy.setChangeOfDirection(true);
+                    return Enemy.Directions.DOWN;
 
                 } else {
                     if (wallCollision.thereIsNoCollisionOnUp(enemy.x, enemy.y)) {
-                        enemy.setDirections(Enemy.Directions.UP);
-                        goUp();
-                        enemy.setChangeOfDirection(true);
-
+                        return Enemy.Directions.UP;
                     }
                 }
 
             }
 
         }
+        return enemy.getDirection();
     }
 
-    private void escapeOnDistanceWhenUpOrDown(int safeDistance) {
+    private Enemy.Directions escapeOnDistanceWhenUpOrDown(int safeDistance) {
         //If enemy is escaping down/up and have option to turn on right
         // check  if player is on left  side then escape on right
-        if (enemy.y % constant.getTILE_SIZE() == 0 && wallCollision.thereIsNoCollisionOnRight(enemy.x, enemy.y) && enemy.x >= player.getX()) {
+        if (isInTheMiddleOfTileY() && wallCollision.thereIsNoCollisionOnRight(enemy.x, enemy.y) && isEnemyOnTheRight()) {
             // if distance between player and enemy is not safe then still go right
             if ((enemy.x - player.getX()) < safeDistance) {
-                enemy.setDirections(Enemy.Directions.RIGHT);
-                goRight();
-                enemy.setChangeOfDirection(true);
-                return;
-                // if distance is safe  then go closer to player
+                return Enemy.Directions.RIGHT;
             }
-
-
         }
         //If enemy is escaping down/up and have option to turn on left
         // check  if player is on right side then escape on left
-        if (enemy.y % constant.getTILE_SIZE() == 0 && wallCollision.thereIsNoCollisionOnLeft(enemy.x, enemy.y) && enemy.x <= player.getX()) {
+        if (isInTheMiddleOfTileY() && wallCollision.thereIsNoCollisionOnLeft(enemy.x, enemy.y) && isEnemyOnTheLeft()) {
             // if distance between player and enemy is not safe then still go right
             if ((enemy.x - player.getX()) > safeDistance) {
-                enemy.setDirections(Enemy.Directions.LEFT);
-                goLeft();
-                enemy.setChangeOfDirection(true);
+                return Enemy.Directions.LEFT;
             }
-
         }
+        return enemy.getDirection();
     }
 
-   public boolean trackPlayerAndCheckIfIsBetterToChangeDirectionThenChangeDirection() {
-        enemy.setChangeOfDirection(false);
+    public Enemy.Directions searchBetterPath() {
         switch (enemy.getDirection()) {
             case UP:
             case DOWN:
 
-                // if brave and is no bonus time
-                if (enemy.isBrave() && !constant.isBONUS()) {
-
-                    if (enemy.x > player.getX() && enemy.x % constant.getTILE_SIZE() == 0 && wallCollision.thereIsNoCollisionOnLeft(enemy.x, enemy.y)) {
-                        enemy.setDirections(Enemy.Directions.LEFT);
-                        goLeft();
-                        enemy.setChangeOfDirection(true);
-                        break;
-                    }
-                    if (enemy.x < player.getX() && enemy.x % constant.getTILE_SIZE() == 0 && wallCollision.thereIsNoCollisionOnRight(enemy.x, enemy.y)) {
-                        enemy.setDirections(Enemy.Directions.RIGHT);
-                        goRight();
-                        enemy.setChangeOfDirection(true);
-                        break;
-                    }
-                    break;
-
-
-                } else {
-                    // if is not brave and bonus is off then go closer and when is close to player run away
-                    if (!constant.isBONUS()) {
+                if (!Constant.BONUS) {
+                    if (enemy.isBrave()) {
+                        if (isEnemyOnTheRight() && isInMiddleOfTileX() && wallCollision.thereIsNoCollisionOnLeft(enemy.x, enemy.y)) {
+                            goLeft();
+                            return Enemy.Directions.LEFT;
+                        }
+                        if (isEnemyOnTheLeft() && isInMiddleOfTileX() && wallCollision.thereIsNoCollisionOnRight(enemy.x, enemy.y)) {
+                            goRight();
+                            return Enemy.Directions.RIGHT;
+                        }
+                        return enemy.getDirection();
+                    } else {
                         escapeOnDistanceWhenUpOrDown(160);
                         break;
-                        // is is bonus then everyone run away
-                    } else {
-                        escapeOnDistanceWhenUpOrDown(1600);
                     }
+                } else {
+                    escapeOnDistanceWhenUpOrDown(200);
                     break;
                 }
 
             case RIGHT:
             case LEFT:
                 // if brave then get closer to player
-                if (enemy.isBrave() && !constant.isBONUS()) {
-                    if (enemy.y > player.getY() && enemy.y % constant.getTILE_SIZE() == 0 && wallCollision.thereIsNoCollisionOnUp(enemy.x, enemy.y)) {
-                        enemy.setDirections(Enemy.Directions.UP);
-                        goUp();
-                        enemy.setChangeOfDirection(true);
+                if (!Constant.BONUS) {
+                    if (enemy.isBrave()) {
+                        if (isEnemyUnderPlayer() && isInTheMiddleOfTileY() && wallCollision.thereIsNoCollisionOnUp(enemy.x, enemy.y)) {
+                            goUp();
+                            return Enemy.Directions.UP;
+                        }
+                        if (isEnemyAbovePlayer() && isInTheMiddleOfTileY() && wallCollision.thereIsNoCollisionOnDown(enemy.x, enemy.y)) {
+                            goDown();
+                            return Enemy.Directions.DOWN;
+                        }
                         break;
-                    }
-                    if (enemy.y < player.getY() && enemy.y % constant.getTILE_SIZE() == 0 && wallCollision.thereIsNoCollisionOnDown(enemy.x, enemy.y)) {
-                        enemy.setDirections(Enemy.Directions.DOWN);
-                        goDown();
-
-                        enemy.setChangeOfDirection(true);
-                        break;
-                    }
-                    break;
-
-                    // if is not brave  then when is close to player run away
-                } else {
-                    if (!constant.isBONUS()) {
-                        // is bonus if OFF but enemy is not brave
-                        EscapeOnDistanceWhenLeftOrRight(160);
-                        break;
-                        // when bonus is on
+                        // if is not brave  then when is close to player run away
                     } else {
-                        EscapeOnDistanceWhenLeftOrRight(1600);
+                        // is bonus if OFF but enemy is not brave
+                        return escapeOnDistanceWhenLeftOrRight(160);
                     }
-
-
-                    break;
+                } else {
+                    return escapeOnDistanceWhenUpOrDown(200);
                 }
-                default:
-                    enemy.setChangeOfDirection(false);
+            default:
+                return enemy.getDirection();
         }
-        return enemy.isChangeOfDirection();
+        return enemy.getDirection();
     }
 
+
+    private boolean checkIfUpAndDownAreClean() {
+        return wallCollision.thereIsNoCollisionOnDown(enemy.x, enemy.y) && wallCollision.thereIsNoCollisionOnUp(enemy.x, enemy.y);
+
+    }
+
+    public boolean checkIfIsAtHome() {
+        return enemy.y <= Constant.TILE_SIZE * 11 && enemy.y > Constant.TILE_SIZE * 8 && enemy.x > Constant.TILE_SIZE * 17 && enemy.x < Constant.TILE_SIZE * 21;
+    }
+
+    private void CheckAndMoveDownOrUp() {
+        if (isEnemyAbovePlayer()) {
+            enemy.setDirections(Enemy.Directions.DOWN);
+            goDown();
+        } else {
+            enemy.setDirections(Enemy.Directions.UP);
+            goUp();
+        }
+    }
+
+    private void checkAndMoveUp() {
+        if (wallCollision.thereIsNoCollisionOnUp(enemy.x, enemy.y)) {
+            enemy.setDirections(Enemy.Directions.UP);
+            goUp();
+        }
+    }
+
+    private void checkAndMoveDown() {
+        if (wallCollision.thereIsNoCollisionOnDown(enemy.x, enemy.y)) {
+            enemy.setDirections(Enemy.Directions.DOWN);
+            goDown();
+        }
+    }
+
+    private void checkAndMOveRight() {
+        if (wallCollision.thereIsNoCollisionOnRight(enemy.x, enemy.y)) {
+            enemy.setDirections(Enemy.Directions.RIGHT);
+            goRight();
+        }
+    }
+
+    private void checkAndMoveLeft() {
+        if (wallCollision.thereIsNoCollisionOnLeft(enemy.x, enemy.y)) {
+            enemy.setDirections(Enemy.Directions.LEFT);
+            goLeft();
+        }
+    }
+
+    private boolean checkIfLeftAndRightAreClean() {
+        return wallCollision.thereIsNoCollisionOnLeft(enemy.x, enemy.y) && wallCollision.thereIsNoCollisionOnRight(enemy.x, enemy.y);
+    }
+
+
+    private void chooseLeftOrRight() {
+        if (enemy.x > player.getX()) {
+            enemy.setDirections(Enemy.Directions.LEFT);
+            goLeft();
+        } else {
+            enemy.setDirections(Enemy.Directions.RIGHT);
+            goRight();
+        }
+    }
+
+    private boolean isEnemyAbovePlayer() {
+        return enemy.y < player.getY();
+    }
+
+    private boolean isEnemyUnderPlayer() {
+        return enemy.y > player.getY();
+    }
+
+    private boolean isInTheMiddleOfTileY() {
+        return enemy.y % Constant.TILE_SIZE == 0;
+    }
+
+    private boolean isEnemyOnTheLeft() {
+        return enemy.x <= player.getX();
+    }
+
+    private boolean isEnemyOnTheRight() {
+        return enemy.x >= player.getX();
+    }
+
+    private boolean isInMiddleOfTileX() {
+        return enemy.x % Constant.TILE_SIZE == 0;
+    }
+
+    public void goDown() {
+        enemy.y += Constant.SPEED;
+    }
+
+    public void goUp() {
+        enemy.y -= Constant.SPEED;
+    }
+
+    public void goRight() {
+        enemy.x += Constant.SPEED;
+    }
+
+    public void goLeft() {
+        enemy.x -= Constant.SPEED;
+    }
 }

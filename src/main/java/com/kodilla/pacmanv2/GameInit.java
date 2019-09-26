@@ -1,5 +1,6 @@
 package com.kodilla.pacmanv2;
 
+import com.kodilla.pacmanv2.items.BackgroundImageLevel1;
 import com.kodilla.pacmanv2.items.Enemy;
 import com.kodilla.pacmanv2.items.ItemPictures;
 import com.kodilla.pacmanv2.items.Player;
@@ -7,7 +8,6 @@ import com.kodilla.pacmanv2.itemsControl.WallCollision;
 import com.kodilla.pacmanv2.pacmanBoard.BonusMode;
 import com.kodilla.pacmanv2.pacmanBoard.Music;
 import com.kodilla.pacmanv2.pacmanBoard.TimerTaskPaccman;
-import com.kodilla.pacmanv2.items.BackgroundImageLevel1;
 import com.kodilla.pacmanv2.pacmanBoard.levelFactory.LevelFactory;
 import com.kodilla.pacmanv2.pacmanBoard.levelFactory.Maze;
 import com.kodilla.pacmanv2.pacmanBoard.menu.GameMenu;
@@ -18,14 +18,11 @@ import com.kodilla.pacmanv2.pacmanBoard.statistic.PlayerLives;
 import com.kodilla.pacmanv2.pacmanBoard.statistic.Ranking;
 import com.kodilla.pacmanv2.pacmanBoard.statistic.ScoreCounter;
 
+import static com.kodilla.pacmanv2.Constant.TILE_SIZE;
+
 public class GameInit {
 
-
-
     private boolean isPause;
-
-
-
     private boolean isRunning;
     private Player player;
     private Winner winner;
@@ -45,16 +42,15 @@ public class GameInit {
 
     GameInit() {
 
-
         ItemPictures itemPicture = new ItemPictures();
-        level = new LevelFactory(constant);
-        WallCollision wallCollision = new WallCollision(constant);
-        BonusMode bonusMode = new BonusMode(constant);
-        player = new Player(constant.getTILE_SIZE(), constant.getTILE_SIZE() * 10,this,constant, wallCollision, bonusMode);
-        enemyBlue = new Enemy(constant.getTILE_SIZE() * 19, constant.getTILE_SIZE() * 10, false, "BLUE",player,constant, wallCollision,level,this);
-        enemyRed = new Enemy(constant.getTILE_SIZE() * 18, constant.getTILE_SIZE() * 10, true, "RED",player,constant, wallCollision,level,this);
-        enemyPurple = new Enemy(constant.getTILE_SIZE() * 18, constant.getTILE_SIZE() * 11, true, "PURPLE",player,constant, wallCollision,level,this);
-        enemyGreen = new Enemy(constant.getTILE_SIZE() * 19, constant.getTILE_SIZE() * 11, false, "GREEN",player,constant, wallCollision,level,this);
+        level = new LevelFactory();
+        WallCollision wallCollision = new WallCollision();
+        BonusMode bonusMode = new BonusMode();
+        player = new Player(TILE_SIZE, TILE_SIZE * 10, this, wallCollision, bonusMode);
+        enemyBlue = new Enemy(TILE_SIZE * 19, TILE_SIZE * 10, false, "BLUE", player, wallCollision, level, this);
+        enemyRed = new Enemy(TILE_SIZE * 18, TILE_SIZE * 10, true, "RED", player, wallCollision, level, this);
+        enemyPurple = new Enemy(TILE_SIZE * 18, TILE_SIZE * 11, true, "PURPLE", player, wallCollision, level, this);
+        enemyGreen = new Enemy(TILE_SIZE * 19, TILE_SIZE * 11, false, "GREEN", player, wallCollision, level, this);
         score = new ScoreCounter();
         TimerTaskPaccman timerMusic = new TimerTaskPaccman(413);
         welcomeTimerMusic = new TimerTaskPaccman(4216);
@@ -65,7 +61,7 @@ public class GameInit {
         winner = new Winner();
         ranking = new Ranking();
         rankingMenu = new RankingMenu(this);
-        gameMenu = new GameMenu(this,rankingMenu);
+        gameMenu = new GameMenu(this, rankingMenu);
         isRunning = false;
 
 
@@ -98,20 +94,20 @@ public class GameInit {
         playerLives.setLives(3);
         player.sendPlayerToStart();
         music.playWelocmeSound();
-        Player.setAddedToRanking(false);
         welcomeTimerMusic.StartTimer();
         gameMenu.getPanel().setVisible(false);
         rankingMenu.getPanel().setVisible(false);
         isPause = false;
         player.setMainDirection("STOP");
         player.setNextDirection("STOP");
-        constant.setBONUS(false);
+        Constant.setBONUS(false);
         sendEnemyToStartingLocation();
         level.closeDoor();
-        level = new LevelFactory(constant);
+        level = new LevelFactory();
         score.resetScore();
 
     }
+
     Ranking getRanking() {
         return ranking;
     }
@@ -174,19 +170,18 @@ public class GameInit {
         return winner;
     }
 
-    public Constant getConstant() {
-        return constant;
-    }
-
     GameMenu getGameMenu() {
         return gameMenu;
     }
+
     boolean isRunning() {
         return isRunning;
     }
+
     void setRunning(boolean running) {
         isRunning = running;
     }
+
     RankingMenu getRankingMenu() {
         return rankingMenu;
     }

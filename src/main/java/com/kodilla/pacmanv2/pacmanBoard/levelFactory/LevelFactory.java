@@ -1,33 +1,30 @@
 package com.kodilla.pacmanv2.pacmanBoard.levelFactory;
 
-import com.kodilla.pacmanv2.Constant;
 import com.kodilla.pacmanv2.items.Dot;
 import com.kodilla.pacmanv2.items.Empty;
 import com.kodilla.pacmanv2.items.Wall;
 
 import java.awt.*;
-import java.io.*;
+import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.*;
+import java.util.Map;
+import java.util.Scanner;
 import java.util.stream.Collectors;
 
 public class LevelFactory {
 
     public static Maze maze = new Maze();
-    private Constant constant;
 
-    public LevelFactory(Constant constant) {
-        this.constant = constant;
+    public LevelFactory() {
+
 
         // try read the file
         Scanner scanner = null;
-
         ClassLoader classLoader = getClass().getClassLoader();
         InputStream is = classLoader.getResourceAsStream("assets/text/pacman_level.txt");
-
         // File fileTxTLevel = new File(Objects.requireNonNull(classLoader.getResource("assets/text/pacman_level.txt")).getFile());
         scanner = new Scanner(is);
-
 
         ArrayList<String> levelData = new ArrayList<>();
         assert scanner != null;
@@ -35,7 +32,6 @@ public class LevelFactory {
             levelData.add(scanner.nextLine());
         }
         scanner.close();
-
 
         // load elements from file
         int w = levelData.get(0).length();
@@ -49,21 +45,21 @@ public class LevelFactory {
                 switch (c) {
 
                     case '1':
-                        Wall wall = new Wall(yy * 40, xx * 40,constant);
+                        Wall wall = new Wall(yy * 40, xx * 40);
 
                         lineOfMaze.addElement(yy, wall);
 
                         break;
                     case '0':
-                        dot = new Dot(yy * 40, xx * 40,false,constant);
+                        dot = new Dot(yy * 40, xx * 40, false);
                         lineOfMaze.addElement(yy, dot);
                         break;
                     case '2':
-                        dot = new Dot(yy * 40, xx * 40, true,constant);
+                        dot = new Dot(yy * 40, xx * 40, true);
                         lineOfMaze.addElement(yy, dot);
                         break;
                     case '3':
-                        Empty empty = new Empty(yy * 40, xx * 40,constant);
+                        Empty empty = new Empty(yy * 40, xx * 40);
                         lineOfMaze.addElement(yy, empty);
                         break;
                 }
@@ -75,25 +71,20 @@ public class LevelFactory {
     }
 
     public void closeDoor() {
-
-        maze.getMaze().get(9).getLineOfItems().replace(18, new Wall(720, 360,constant));
-        maze.getMaze().get(9).getLineOfItems().replace(19, new Wall(760, 360,constant));
-        maze.getMaze().get(9).getLineOfItems().replace(20, new Wall(800, 360,constant));
-
+        maze.getMaze().get(9).getLineOfItems().replace(18, new Wall(720, 360));
+        maze.getMaze().get(9).getLineOfItems().replace(19, new Wall(760, 360));
+        maze.getMaze().get(9).getLineOfItems().replace(20, new Wall(800, 360));
     }
 
     public void openDoor() {
-
-        maze.getMaze().get(9).getLineOfItems().replace(18, new Empty(720, 360,constant));
-        maze.getMaze().get(9).getLineOfItems().replace(19, new Empty(760, 360,constant));
-        maze.getMaze().get(9).getLineOfItems().replace(20, new Empty(800, 360,constant));
-
+        maze.getMaze().get(9).getLineOfItems().replace(18, new Empty(720, 360));
+        maze.getMaze().get(9).getLineOfItems().replace(19, new Empty(760, 360));
+        maze.getMaze().get(9).getLineOfItems().replace(20, new Empty(800, 360));
     }
 
     public void render(Graphics g) {
 
         List<Map.Entry> listOfDots = listOfDots();
-
         for (Map.Entry listOfDot : listOfDots) {
             if (listOfDot.getValue() instanceof Dot) {
                 Dot dot = (Dot) listOfDot.getValue();
@@ -108,7 +99,6 @@ public class LevelFactory {
                 .flatMap(row -> row.getValue().getLineOfItems().entrySet().stream())
                 .filter(t -> (t.getValue() instanceof Dot))
                 .collect(Collectors.toList());
-
         listOfDots.size();
         return listOfDots;
     }

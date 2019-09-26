@@ -8,11 +8,9 @@ import java.util.Objects;
 
 public class ItemPictures {
 
-    public static BufferedImage[][] player,deadPlayer;
+    public static BufferedImage[][] player;
     static BufferedImage[] enemyBlue, enemyRed, enemyGreen, enemyPurple;
     static BufferedImage dot, bigDot;
-
-
     private BufferedImage TextureGrid;
 
     public ItemPictures() {
@@ -20,20 +18,14 @@ public class ItemPictures {
 
             ClassLoader classLoader = getClass().getClassLoader();
             InputStream is = classLoader.getResourceAsStream("assets/textures/grid.png");
-
-           // File filePlayer = new File(Objects.requireNonNull(getClass().getClassLoader().getResource("assets/textures/grid.png")).getFile());
-
-
+            // File filePlayer = new File(Objects.requireNonNull(getClass().getClassLoader().getResource("assets/textures/grid.png")).getFile());
             TextureGrid = ImageIO.read(Objects.requireNonNull(is));
-
-
         } catch (IOException e) {
             System.out.print("ERORO");
             e.printStackTrace();
         }
 
         player = new BufferedImage[6][4];
-
 
         //right position animation
         player[0][0] = getPartOfImage(0, 0);
@@ -57,13 +49,13 @@ public class ItemPictures {
         player[3][3] = getPartOfImage(96, 96);
 
         // dead player
-        player[4][0] = getPartOfImage(0,288);
-        player[4][1] = getPartOfImage(32,288);
-        player[4][2] = getPartOfImage(64,288);
-        player[4][3] = getPartOfImage(96,288);
-        player[5][0] = getPartOfImage(0,320);
-        player[5][1] = getPartOfImage(32,320);
-        player[5][2] = getPartOfImage(64,320);
+        player[4][0] = getPartOfImage(0, 288);
+        player[4][1] = getPartOfImage(32, 288);
+        player[4][2] = getPartOfImage(64, 288);
+        player[4][3] = getPartOfImage(96, 288);
+        player[5][0] = getPartOfImage(0, 320);
+        player[5][1] = getPartOfImage(32, 320);
+        player[5][2] = getPartOfImage(64, 320);
 
 
         enemyBlue = new BufferedImage[3];
@@ -104,13 +96,9 @@ public class ItemPictures {
         dot = getPartOfImage(0, 256);
         bigDot = getPartOfImage(32, 256);
 
-
-
     }
 
     private BufferedImage getPartOfImage(int xx, int yy) {
         return TextureGrid.getSubimage(xx, yy, 32, 32);
     }
-
-
 }

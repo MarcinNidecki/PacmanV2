@@ -1,12 +1,13 @@
 package com.kodilla.pacmanv2.pacmanBoard.statistic;
 
-import com.kodilla.pacmanv2.Constant;
 import com.kodilla.pacmanv2.items.ItemPictures;
 
 import java.awt.*;
 
+import static com.kodilla.pacmanv2.Constant.TILE_SIZE;
+
 public class PlayerLives {
-    private Constant constant = new Constant();
+
     private static int lives = 3;
 
     public static int getLives() {
@@ -23,10 +24,10 @@ public class PlayerLives {
 
 
     public void paintComponent(Graphics g) {
-        int position = constant.getTILE_SIZE() * 3;
+        int position = TILE_SIZE * 3;
         for (int i = 0; i < lives; i++) {
             g.drawImage(ItemPictures.player[0][2], position, 900, 32, 32, null);
-            position += constant.getTILE_SIZE();
+            position += TILE_SIZE;
 
         }
 

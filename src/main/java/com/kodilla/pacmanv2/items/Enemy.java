@@ -9,45 +9,42 @@ import com.kodilla.pacmanv2.pacmanBoard.statistic.PlayerLives;
 
 import java.awt.*;
 
+import static com.kodilla.pacmanv2.Constant.*;
+
 public class Enemy extends Rectangle {
 
     private final EnemyControl enemyControl;
-    private Constant constant;
-    private GameInit gameInit;
     private final WallCollision wallCollision;
     private int startingLocationX, startingLocationY, tick = 0, animationPicture;
     private boolean brave;
-    private boolean changeOfDirection;
     private boolean itsEye = false;
     private String colour;
     private Directions direction = Directions.DOWN;
     private LevelFactory levelFactory;
 
-    public Enemy(int x, int y, boolean brave, String colour, Player player, Constant constant, WallCollision wallCollisio, LevelFactory levelFactory, GameInit gameInit) {
-        this.enemyControl = new EnemyControl(this, player, constant,wallCollisio,gameInit);
-        this.wallCollision = new WallCollision(constant);
+    public Enemy(int x, int y, boolean brave, String colour, Player player, WallCollision wallCollision, LevelFactory levelFactory, GameInit gameInit) {
+        this.enemyControl = new EnemyControl(this, player, wallCollision, gameInit);
+        this.wallCollision = new WallCollision();
         this.brave = brave;
         this.colour = colour;
-        this.constant = constant;
         this.levelFactory = levelFactory;
         startingLocationY = y;
         startingLocationX = x;
-        setBounds(x, y, constant.getTILE_SIZE(), constant.getTILE_SIZE());
+        setBounds(x, y, TILE_SIZE, TILE_SIZE);
     }
 
     public void enemyTick() {
 
         // TURN ON animation enemy when bonus ON
-        if (constant.isBONUS()) {
+        if (BONUS) {
             animationPicture = 1;
         } else {
             animationPicture = 0;
         }
-
         enemyControl.checkIfIntersectWithPlayer(x, y);
         enemyControl.checkIfNeedToUseATeleport();
 
-        if (enemyControl.checkIfIsInHome()) {
+        if (enemyControl.checkIfIsAtHome()) {
             levelFactory.openDoor();
             if (colour.equals("RED") || colour.equals("BLUE")) {
                 itsEye = false;
@@ -62,16 +59,16 @@ public class Enemy extends Rectangle {
         }
 
         goToHomeWhenIsEye();
-        if(PlayerLives.getLives()==0) {
-            direction= Directions.STOP;
+        if (PlayerLives.getLives() == 0) {
+            direction = Directions.STOP;
         }
 
         switch (direction) {
             case DOWN:
 
                 if (wallCollision.thereIsNoCollisionOnDown(x, y)) {
-                    if (enemyControl.trackPlayerAndCheckIfIsBetterToChangeDirectionThenChangeDirection()) {
-                        enemyControl.trackPlayerAndCheckIfIsBetterToChangeDirectionThenChangeDirection();
+                    if (enemyControl.searchBetterPath() != direction) {
+                        direction = enemyControl.searchBetterPath();
                         break;
                     }
                     enemyControl.goDown();
@@ -86,8 +83,8 @@ public class Enemy extends Rectangle {
             case UP:
 
                 if (wallCollision.thereIsNoCollisionOnUp(x, y)) {
-                    if (enemyControl.trackPlayerAndCheckIfIsBetterToChangeDirectionThenChangeDirection()) {
-                        enemyControl.trackPlayerAndCheckIfIsBetterToChangeDirectionThenChangeDirection();
+                    if (enemyControl.searchBetterPath() != direction) {
+                        direction = enemyControl.searchBetterPath();
                         break;
                     }
                     enemyControl.goUp();
@@ -101,8 +98,8 @@ public class Enemy extends Rectangle {
             case LEFT:
 
                 if (wallCollision.thereIsNoCollisionOnLeft(x, y)) {
-                    if (enemyControl.trackPlayerAndCheckIfIsBetterToChangeDirectionThenChangeDirection()) {
-                        enemyControl.trackPlayerAndCheckIfIsBetterToChangeDirectionThenChangeDirection();
+                    if (enemyControl.searchBetterPath() != direction) {
+                        direction = enemyControl.searchBetterPath();
                         break;
                     }
                     enemyControl.goLeft();
@@ -116,8 +113,8 @@ public class Enemy extends Rectangle {
                 }
             case RIGHT:
                 if (wallCollision.thereIsNoCollisionOnRight(x, y)) {
-                    if (enemyControl.trackPlayerAndCheckIfIsBetterToChangeDirectionThenChangeDirection()) {
-                        enemyControl.trackPlayerAndCheckIfIsBetterToChangeDirectionThenChangeDirection();
+                    if (enemyControl.searchBetterPath() != direction) {
+                        direction = enemyControl.searchBetterPath();
                         break;
                     }
                     enemyControl.goRight();
@@ -159,14 +156,12 @@ public class Enemy extends Rectangle {
     }
 
     public void waitThenGoOutside(int timeInSeconds) {
-        double time = timeInSeconds * constant.getTARGET_TICK();
+        double time = timeInSeconds * TARGET_TICK;
         if (wallCollision.thereIsNoCollisionOnUp(x, y)) {
-            // when fps is set to 60  then 1 second is 60 ticks
             setDirections(Enemy.Directions.STOP);
             if (tick > time) {
                 setDirections(Directions.UP);
                 enemyControl.goUp();
-
             }
             tick++;
         }
@@ -178,14 +173,6 @@ public class Enemy extends Rectangle {
 
     public void setItsEye(boolean itsEye) {
         this.itsEye = itsEye;
-    }
-
-    public boolean isChangeOfDirection() {
-        return changeOfDirection;
-    }
-
-    public void setChangeOfDirection(boolean changeOfDirection) {
-        this.changeOfDirection = changeOfDirection;
     }
 
     public Directions getDirection() {
@@ -220,7 +207,6 @@ public class Enemy extends Rectangle {
         g.drawImage(ItemPictures.enemyGreen[animationPicture], x, y, 32, 32, null);
     }
 
-
     public void setTick(int tick) {
         this.tick = tick;
     }
@@ -232,4 +218,5 @@ public class Enemy extends Rectangle {
         RIGHT,
         STOP
     }
+
 }
