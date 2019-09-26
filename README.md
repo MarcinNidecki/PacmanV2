@@ -10,8 +10,8 @@ How to build
 
 Movie
 --------
-https://www.youtube.com/watch?v=w90XKe0dJ6Y
 
+[![Watch the video](https://im3.ezgif.com/tmp/ezgif-3-2d99b7276aa6.gif)](https://www.youtube.com/watch?v=w90XKe0dJ6Y)
 Screenshot
 ----------
-![screenshot](x)
+![screenshot](pacman2.jpg)
