@@ -4,7 +4,6 @@
 
 A Pac-Man written in Java with ATW and Swing .
 
-This is my first project.
 
 
 ------------
